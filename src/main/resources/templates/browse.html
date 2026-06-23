@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Browse Found Items – Smart Campus Lost &amp; Found</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #F0F4FF; }
+        .navbar {
+            background: #1A237E; padding: 0 32px;
+            display: flex; align-items: center;
+            justify-content: space-between; height: 60px;
+        }
+        .navbar-brand { color: white; font-size: 18px; font-weight: bold; text-decoration: none; }
+        .navbar-brand span { color: #90CAF9; }
+        .navbar-links { display: flex; gap: 8px; }
+        .navbar-links a { color: #BBDEFB; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; }
+        .navbar-links a:hover { background: rgba(255,255,255,0.15); }
+        .main-content { padding: 32px; max-width: 1100px; margin: 0 auto; }
+        h2 { color: #1A237E; margin-bottom: 24px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .item-card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .item-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .item-card-img {
+            width: 100%; height: 160px; background: #E3F2FD;
+            display: flex; align-items: center; justify-content: center;
+            color: #90CAF9; font-size: 40px;
+        }
+        .item-card-body { padding: 16px; }
+        .item-card-title { font-size: 15px; font-weight: bold; color: #1A237E; margin-bottom: 8px; }
+        .item-card-meta { font-size: 12px; color: #666; margin-bottom: 4px; }
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: bold; margin-bottom: 12px;
+        }
+        .badge-found { background: #D1FAE5; color: #065F46; }
+        .btn-view {
+            display: block; text-align: center; padding: 9px;
+            background: #1A237E; color: white; text-decoration: none;
+            border-radius: 8px; font-size: 13px; font-weight: bold;
+        }
+        .btn-view:hover { background: #1565C0; }
+        .empty { text-align: center; padding: 60px; color: #666; }
+        .empty h3 { font-size: 20px; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a th:href="@{/}" class="navbar-brand">Smart Campus <span>Lost &amp; Found</span></a>
+    <div class="navbar-links">
+        <a th:href="@{/items}">Browse Found Items</a>
+        <a th:href="@{/items/lost/new}" style="background:#0288D1; color:white; font-weight:bold;">+ Report Lost</a>
+        <a th:href="@{/items/found/new}" style="background:#0288D1; color:white; font-weight:bold;">+ Report Found</a>
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/logout}" style="color:#FF8A80;">Logout</a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <h2>Recently Found Items</h2>
+
+    <div th:if="${items.empty}" class="empty">
+        <h3>No found items yet</h3>
+        <p>Be the first to report a found item and help someone recover their belongings!</p>
+    </div>
+
+    <div class="grid" th:if="${!items.empty}">
+        <div class="item-card" th:each="item : ${items}">
+            <div class="item-card-img">
+                <img th:if="${item.photoUrl != null}"
+                     th:src="@{/uploads/{photo}(photo=${item.photoUrl})}"
+                     style="width:100%; height:100%; object-fit:cover;" alt="Item photo"/>
+                <span th:if="${item.photoUrl == null}">📦</span>
+            </div>
+            <div class="item-card-body">
+                <span class="badge badge-found">FOUND</span>
+                <div class="item-card-title" th:text="${item.title}"></div>
+                <div class="item-card-meta">📂 <span th:text="${item.category}"></span></div>
+                <div class="item-card-meta">📍 <span th:text="${item.location}"></span></div>
+                <div class="item-card-meta" style="margin-bottom:12px;">📅 <span th:text="${item.dateOccurred}"></span></div>
+                <a th:href="@{/items/{id}(id=${item.id})}" class="btn-view">View Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

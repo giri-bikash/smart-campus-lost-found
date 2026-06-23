@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Item – Smart Campus Lost &amp; Found</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #F0F4FF; min-height: 100vh; }
+        .navbar {
+            background: #1A237E; padding: 0 32px;
+            display: flex; align-items: center;
+            justify-content: space-between; height: 60px;
+        }
+        .navbar-brand { color: white; font-size: 18px; font-weight: bold; text-decoration: none; }
+        .navbar-brand span { color: #90CAF9; }
+        .navbar-links { display: flex; gap: 8px; }
+        .navbar-links a { color: #BBDEFB; text-decoration: none; padding: 8px 14px; border-radius: 6px; font-size: 14px; }
+        .navbar-links a:hover { background: rgba(255,255,255,0.15); }
+        .main-content { padding: 32px; max-width: 700px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        h2 { color: #1A237E; margin-bottom: 8px; }
+        .sub { color: #666; font-size: 14px; margin-bottom: 28px; }
+        .toggle-row { display: flex; gap: 12px; margin-bottom: 24px; }
+        .toggle-btn {
+            flex: 1; padding: 12px; border: 2px solid #D1D5DB;
+            border-radius: 8px; background: white; cursor: pointer;
+            font-size: 14px; font-weight: bold; color: #666;
+        }
+        .toggle-btn.active-lost { border-color: #C62828; background: #FEE2E2; color: #C62828; }
+        .toggle-btn.active-found { border-color: #2E7D32; background: #E8F5E9; color: #2E7D32; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; font-weight: bold; color: #374151; margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 10px 14px; border: 1px solid #D1D5DB;
+            border-radius: 8px; font-size: 14px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: #1565C0;
+        }
+        .form-error { color: #DC2626; font-size: 12px; margin-top: 4px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .btn-submit {
+            width: 100%; padding: 13px; background: #1A237E; color: white;
+            border: none; border-radius: 8px; font-size: 15px;
+            font-weight: bold; cursor: pointer; margin-top: 8px;
+        }
+        .btn-submit:hover { background: #1565C0; }
+        .upload-box {
+            border: 2px dashed #D1D5DB; border-radius: 8px;
+            padding: 20px; text-align: center; color: #9CA3AF;
+            cursor: pointer; font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a th:href="@{/}" class="navbar-brand">Smart Campus <span>Lost &amp; Found</span></a>
+    <div class="navbar-links">
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/items}">Browse</a>
+        <a th:href="@{/logout}" style="color:#FF8A80;">Logout</a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="card">
+        <h2 th:text="${itemType == 'LOST'} ? 'Report a Lost Item' : 'Report a Found Item'"></h2>
+        <p class="sub">Fill in the details below. Our system will automatically search for a match.</p>
+
+        <!-- Toggle -->
+        <div class="toggle-row">
+            <a th:href="@{/items/lost/new}" style="text-decoration:none; flex:1;">
+                <button type="button"
+                    th:classappend="${itemType == 'LOST'} ? 'active-lost' : ''"
+                    class="toggle-btn" style="width:100%;">
+                    😢 I Lost Something
+                </button>
+            </a>
+            <a th:href="@{/items/found/new}" style="text-decoration:none; flex:1;">
+                <button type="button"
+                    th:classappend="${itemType == 'FOUND'} ? 'active-found' : ''"
+                    class="toggle-btn" style="width:100%;">
+                    🎉 I Found Something
+                </button>
+            </a>
+        </div>
+
+        <form th:action="@{/items/save}" th:object="${item}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{type}" th:value="${itemType}"/>
+
+            <div class="form-group">
+                <label>Item Title *</label>
+                <input type="text" th:field="*{title}"
+                       placeholder="e.g. Black iPhone 15, Blue Backpack, Student ID Card"/>
+                <span class="form-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select th:field="*{category}">
+                        <option value="">-- Select Category --</option>
+                        <option value="ELECTRONICS">Electronics</option>
+                        <option value="CLOTHING">Clothing</option>
+                        <option value="DOCUMENTS">Documents / ID</option>
+                        <option value="KEYS">Keys</option>
+                        <option value="BAGS">Bags / Backpacks</option>
+                        <option value="OTHER">Other</option>
+                    </select>
+                    <span class="form-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Campus Location *</label>
+                    <select th:field="*{location}">
+                        <option value="">-- Select Location --</option>
+                        <option value="A-Wing">A-Wing</option>
+                        <option value="B-Wing">B-Wing</option>
+                        <option value="C-Wing">C-Wing</option>
+                        <option value="D-Wing">D-Wing</option>
+                        <option value="Library">Library</option>
+                        <option value="Cafeteria">Cafeteria</option>
+                        <option value="Gym">Gym / Athletics</option>
+                        <option value="Parking Lot">Parking Lot</option>
+                        <option value="Classroom">Classroom</option>
+                        <option value="Washroom">Washroom</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="form-error" th:if="${#fields.hasErrors('location')}" th:errors="*{location}"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Date *</label>
+                <input type="date" th:field="*{dateOccurred}"/>
+                <span class="form-error" th:if="${#fields.hasErrors('dateOccurred')}" th:errors="*{dateOccurred}"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea th:field="*{description}" rows="4"
+                          placeholder="Describe the item in detail — colour, brand, any identifying features..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Photo (optional)</label>
+                <div class="upload-box" onclick="document.getElementById('photoFile').click()">
+                    📎 Click to upload a photo (JPG, PNG — max 5MB)
+                </div>
+                <input type="file" id="photoFile" name="photo" accept="image/*" style="display:none;"/>
+            </div>
+
+            <button type="submit" class="btn-submit"
+                    th:text="${itemType == 'LOST'} ? 'Submit Lost Item Report' : 'Submit Found Item Report'">
+            </button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard – Smart Campus Lost &amp; Found</title>
+    <th:block th:replace="~{layout :: __}" />
+</head>
+<body>
+<nav th:replace="~{layout :: __nav}"></nav>
+
+<div th:replace="~{layout :: __styles}"></div>
+
+<nav class="navbar">
+    <a th:href="@{/}" class="navbar-brand">Smart Campus <span>Lost &amp; Found</span></a>
+    <div class="navbar-links">
+        <a th:href="@{/items}">Browse Found Items</a>
+        <a th:href="@{/items/lost/new}" class="btn-post">+ Report Lost</a>
+        <a th:href="@{/items/found/new}" class="btn-post">+ Report Found</a>
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <span class="navbar-user" sec:authentication="name"></span>
+        <a th:href="@{/logout}" class="btn-logout" style="color:#FF8A80;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:14px;">Logout</a>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+
+    <h2 style="color:#1A237E; margin-bottom:24px;">My Dashboard</h2>
+
+    <!-- Stats row -->
+    <div class="grid-3" style="margin-bottom:28px;">
+        <div class="card" style="text-align:center; padding:20px;">
+            <div style="font-size:36px; font-weight:bold; color:#1A237E;" th:text="${lostCount}">0</div>
+            <div style="color:#666; font-size:14px; margin-top:4px;">Lost Posts</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px;">
+            <div style="font-size:36px; font-weight:bold; color:#2E7D32;" th:text="${foundCount}">0</div>
+            <div style="color:#666; font-size:14px; margin-top:4px;">Found Posts</div>
+        </div>
+        <div class="card" style="text-align:center; padding:20px;">
+            <div style="font-size:36px; font-weight:bold; color:#E65100;" th:text="${resolvedCount}">0</div>
+            <div style="color:#666; font-size:14px; margin-top:4px;">Resolved</div>
+        </div>
+    </div>
+
+    <!-- My Lost Items -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div class="card-title" style="margin:0;">My Lost Items</div>
+            <a th:href="@{/items/lost/new}" class="btn btn-primary">+ Report Lost Item</a>
+        </div>
+        <div th:if="${lostItems.empty}" class="alert alert-info">You have no lost item posts yet.</div>
+        <table th:if="${!lostItems.empty}" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#F8FAFF;">
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Title</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Category</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Location</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Date</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${lostItems}" style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px; font-size:14px;" th:text="${item.title}"></td>
+                    <td style="padding:10px; font-size:14px;" th:text="${item.category}"></td>
+                    <td style="padding:10px; font-size:14px;" th:text="${item.location}"></td>
+                    <td style="padding:10px; font-size:14px;" th:text="${item.dateOccurred}"></td>
+                    <td style="padding:10px;">
+                        <span class="badge badge-open" th:text="${item.status}"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- My Found Items -->
+    <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div class="card-title" style="margin:0;">My Found Items</div>
+            <a th:href="@{/items/found/new}" class="btn btn-primary">+ Report Found Item</a>
+        </div>
+        <div th:if="${foundItems.empty}" class="alert alert-info">You have no found item posts yet.</div>
+        <table th:if="${!foundItems.empty}" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#F8FAFF;">
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Title</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Category</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Location</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Date</th>
+                    <th style="padding:10px; text-align:left; font-size:13px; color:#666; border-bottom:1px solid #E5E7EB;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${foundItems}" style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px; font-size:14px;" th:text="${item.title}"></td>
+                    <td style="padding:10px; font-size:14px;" th:text="${item.category}"></td>
+                    <td style="padding:10px; font-size:14px;" th:text="${item.location}"></td>
+                    <td style="padding:10px; font-size:14px;" th:text="${item.dateOccurred}"></td>
+                    <td style="padding:10px;">
+                        <span class="badge badge-found" th:text="${item.status}"></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
